@@ -19,9 +19,9 @@ public class MailService {
     //인증 메일 생성
     public MimeMessage createEmailForm(String email, String authNum) throws MessagingException{
 
-        String fromEmail = "noreply.kickunity@gmail.com"; //보내는 사람
+        String fromEmail = "noreply.mallangorder@gmail.com"; //보내는 사람
         String toEmail  = email; // 받는 사람
-        String title = "Kick-Unity 회원가입 인증"; //메일 제목
+        String title = "Mallang-Order 회원가입 인증"; //메일 제목
 
         MimeMessage message = mailSender.createMimeMessage();
         message.addRecipients(MimeMessage.RecipientType.TO, toEmail); // 받는 사람 설정
@@ -30,7 +30,7 @@ public class MailService {
         //메일 내용 설정
         String msgOfEmail="";
         msgOfEmail += "<div style='margin:20px;'>";
-        msgOfEmail += "<h1> 안녕하세요 Kick-Unity 입니다. </h1>";
+        msgOfEmail += "<h1> 안녕하세요 Mallang-Order 입니다. </h1>";
         msgOfEmail += "<br>";
         msgOfEmail += "<p>아래 코드를 입력해주세요<p>";
         msgOfEmail += "<br>";

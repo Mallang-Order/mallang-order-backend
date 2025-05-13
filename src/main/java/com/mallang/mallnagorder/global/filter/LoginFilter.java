@@ -52,7 +52,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             throw new RuntimeException(e);
         }
 
-        // 클라이언트 요청에서 username, password 추출
+        // 클라이언트 요청에서 loginId, password 추출
         String username = loginRequest.getEmail();
         String password = loginRequest.getPassword();
 
@@ -66,14 +66,25 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     // 로그인 성공 시 실행하는 메서드
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException {
-
         // 유저 정보
         String username = authentication.getName();
-
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
-        GrantedAuthority auth = iterator.next();
-        String role = auth.getAuthority();
+
+        // 권한이 없으면 기본 권한 부여
+        String role = "ROLE_USER";  // 기본적으로 사용자 권한
+
+        if (!authorities.isEmpty()) {
+            Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
+            GrantedAuthority auth = iterator.next();
+
+            // 어드민 권한 확인
+            for (GrantedAuthority authority : authorities) {
+                if (authority.getAuthority().equals("ROLE_ADMIN")) {
+                    role = "ROLE_ADMIN";  // 어드민 권한이 있는 경우, 어드민 권한 설정
+                    break;
+                }
+            }
+        }
 
         // 토큰 생성
         String access = jwtUtil.createJwt("access", username, role, 600000L); // 생명주기 10분
@@ -93,6 +104,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         // 응답 상태 코드 설정
         response.setStatus(HttpStatus.OK.value());
     }
+
 
     // 로그인 실패 시 실행하는 메서드 -> 실패 시 401 응답 코드 반환
     @Override
