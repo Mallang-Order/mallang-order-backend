@@ -93,11 +93,11 @@ public class SecurityConfig {
                 .requestMatchers("/api/**", "/api/join", "/**", "/api/member/**").permitAll()
                 .requestMatchers("/api/admin").hasRole("ADMIN")
                 .requestMatchers("/api/reissue").permitAll()
-                .requestMatchers("/h2-console/**").permitAll() // ✅ H2 Console 허용
+                .requestMatchers("/h2-console/**").permitAll() // H2 Console 허용
                 .anyRequest().authenticated()
         );
 
-// 필터 추가 및 순서 설정
+        // 필터 추가 및 순서 설정
         http
                 .addFilterBefore(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository), UsernamePasswordAuthenticationFilter.class)  // 로그인 필터
                 .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class)  // JWT 필터

@@ -37,17 +37,12 @@ public class JWTUtil {
         return getClaims(token).get("role", String.class);
     }
 
-    public String getCategory(String token) {
-        return getClaims(token).get("category", String.class);
-    }
-
     public Boolean isExpired(String token) {
         return getClaims(token).getExpiration().before(new Date());
     }
 
     public String createJwt(String category, String username, String role, Long expiredMs) {
         return Jwts.builder()
-                .claim("category", category)
                 .claim("username", username)
                 .claim("role", role)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
