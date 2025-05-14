@@ -2,6 +2,7 @@ package com.mallang.mallnagorder.admin.controller;
 
 import com.mallang.mallnagorder.admin.dto.*;
 import com.mallang.mallnagorder.admin.exception.AdminException;
+import com.mallang.mallnagorder.admin.exception.AdminExceptionType;
 import com.mallang.mallnagorder.admin.service.AdminService;
 import com.mallang.mallnagorder.admin.service.EmailAuthService;
 import com.mallang.mallnagorder.auth.service.AuthService;
@@ -52,12 +53,11 @@ public class AdminController {
 
         boolean isValid = emailAuthService.validateAuthNumber(request.getEmail(), request.getAuthNum());
 
-
         if (isValid) {
             EmailCheckResponse response = new EmailCheckResponse(true, "이메일 인증 성공");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
-            EmailCheckResponse response = new EmailCheckResponse(false, "인증번호가 잘못되었습니다.");
+            EmailCheckResponse response = new EmailCheckResponse(false, "인증번호를 다시 확인해주세요.");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
@@ -66,7 +66,13 @@ public class AdminController {
     @PostMapping("/join")
     public ResponseEntity<Long> addMember(@RequestBody JoinRequest request) {
 
+        if (!emailAuthService.isEmailVerified(request.getEmail())) {
+            throw new AdminException(AdminExceptionType.WRONG_EMAIL_AUTHCODE);
+        }
+
+        // 회원가입 성공 시 인증 상태 제거 (선택)
         Long savedAdminId = adminService.join(request);
+        emailAuthService.removeVerifiedStatus(request.getEmail());
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(savedAdminId);
