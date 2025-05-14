@@ -30,7 +30,7 @@ public class CategoryService {
     @Transactional
     public CategoryResponse createCategory(String categoryName, Long adminId) {
         Admin admin = adminRepository.findById(adminId)
-                .orElseThrow(() -> new AdminException(AdminExceptionType.ADMIN_NOT_FOUND));
+                .orElseThrow(() -> new AdminException(AdminExceptionType.ADMIN_NOT_EXIST));
 
         // 카테고리 이름 중복 검사
         if (categoryRepository.existsByCategoryNameAndAdminId(categoryName, adminId)) {
@@ -77,7 +77,7 @@ public class CategoryService {
     @Transactional(readOnly = true)
     public List<CategoryResponse> getCategoriesByAdminId(Long adminId) {
         Admin admin = adminRepository.findById(adminId)
-                .orElseThrow(() -> new AdminException(AdminExceptionType.ADMIN_NOT_FOUND));
+                .orElseThrow(() -> new AdminException(AdminExceptionType.ADMIN_NOT_EXIST));
 
         return categoryRepository.findAllByAdmin(admin).stream()
                 .map(this::toResponse)

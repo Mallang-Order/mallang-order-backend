@@ -58,9 +58,9 @@ public class AdminService {
         Admin savedAdmin = adminRepository.save(admin);
 
         // 디버깅 로그 추가
-        System.out.println("Saved Admin ID: " + savedAdmin.getAdminId());
+        System.out.println("Saved Admin ID: " + savedAdmin.getId());
 
-        return savedAdmin.getAdminId();
+        return savedAdmin.getId();
     }
 
 

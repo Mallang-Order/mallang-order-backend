@@ -31,7 +31,7 @@ public class MenuService {
     @Transactional
     public MenuResponse createMenu(MenuRequest request) {
         Admin admin = adminRepository.findById(request.getAdminId())
-                .orElseThrow(() -> new AdminException(AdminExceptionType.ADMIN_NOT_FOUND));
+                .orElseThrow(() -> new AdminException(AdminExceptionType.ADMIN_NOT_EXIST));
 
         // 'Default' 카테고리 검색 또는 생성
         Category defaultCategory = categoryRepository.findByCategoryNameAndAdminId("Default", admin.getId())
