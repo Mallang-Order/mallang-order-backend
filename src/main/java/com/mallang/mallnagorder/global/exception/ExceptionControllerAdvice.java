@@ -1,5 +1,8 @@
 package com.mallang.mallnagorder.global.exception;
 
+import com.mallang.mallnagorder.category.exception.CategoryException;
+import com.mallang.mallnagorder.kiosk.exception.KioskException;
+import com.mallang.mallnagorder.menu.exception.MenuException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,5 +39,30 @@ public class ExceptionControllerAdvice {
         ExceptionResponse response = ExceptionResponse.from("처리 중 오류가 발생했습니다. 다시 시도해주세요.");
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);  // 500 Internal Server Error
     }
+
+    // CategoryException
+    @ExceptionHandler(CategoryException.class)
+    public ResponseEntity<ExceptionResponse> handleCategoryException(CategoryException ex) {
+        log.error("CategoryException 발생: {}", ex.getMessage(), ex);
+        ExceptionResponse response = ExceptionResponse.from(ex.getExceptionType());
+        return new ResponseEntity<>(response, ex.getExceptionType().getHttpStatus());
+    }
+
+    // MenuException
+    @ExceptionHandler(MenuException.class)
+    public ResponseEntity<ExceptionResponse> handleMenuException(MenuException ex) {
+        log.error("MenuException 발생: {}", ex.getMessage(), ex);
+        ExceptionResponse response = ExceptionResponse.from(ex.getExceptionType());
+        return new ResponseEntity<>(response, ex.getExceptionType().getHttpStatus());
+    }
+
+    // KioskException
+    @ExceptionHandler(KioskException.class)
+    public ResponseEntity<ExceptionResponse> handleKioskException(KioskException ex) {
+        log.error("MenuException 발생: {}", ex.getMessage(), ex);
+        ExceptionResponse response = ExceptionResponse.from(ex.getExceptionType());
+        return new ResponseEntity<>(response, ex.getExceptionType().getHttpStatus());
+    }
+
 
 }

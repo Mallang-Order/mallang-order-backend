@@ -1,6 +1,7 @@
 package com.mallang.mallnagorder.order.domain;
 
 import com.mallang.mallnagorder.admin.domain.Admin;
+import com.mallang.mallnagorder.global.entity.BaseEntity;
 import com.mallang.mallnagorder.kiosk.domain.Kiosk;
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,17 +16,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Order {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long orderId;
+public class Order extends BaseEntity {
 
     @Column(precision = 10, scale = 2)
     private BigDecimal totalPrice;
 
     @Column(nullable = false)
-    private LocalDateTime orderTime;
+    private boolean isCompleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "kiosk_id")
