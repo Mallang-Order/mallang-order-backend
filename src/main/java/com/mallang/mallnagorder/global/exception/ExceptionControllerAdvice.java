@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.io.UnsupportedEncodingException;
 
-@Slf4j
-@RestControllerAdvice
+@Slf4j // @SLf4j는 로깅 기능을 제공한다. log.error(..)등의 로그 출력을 사용할 수 있게 한다.
+@RestControllerAdvice // @ControllerAdvice + @ResponseBody. 예외 발생 시 JSON 형태로 응답을 반환한다.
 public class ExceptionControllerAdvice {
 
     // MethodArgumentNotValidException 처리 (검증 예외 처리)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler(MethodArgumentNotValidException.class) // -> 클라이언트가 잘못된 형식의 데이터 전송?
     public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         log.error("Validation error: {}", ex.getMessage(), ex);
         ExceptionResponse response = ExceptionResponse.from(ex);  // 검증 오류 메시지를 처리
