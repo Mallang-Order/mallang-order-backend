@@ -43,7 +43,6 @@ public class AdminController {
         return new ResponseEntity<>("이메일 인증번호가 발송되었습니다. 인증을 진행해주세요.", HttpStatus.OK);
     }
 
-
     // 이메일 인증번호 확인
     @PostMapping("/emailCheck")
     public ResponseEntity<EmailCheckResponse> emailCheck(@RequestBody EmailCheckRequest request) {
