@@ -31,6 +31,6 @@ public class PlaceOrderHandler implements TypedIntentHandler<PlaceOrderPayload> 
                 .totalPrice(payload.getTotalPrice())
                 .items(payload.getItems())
                 .build();
-        orderService.placeOrder(dto, admin);
+        orderService.placeOrder(admin, dto);
     }
 }

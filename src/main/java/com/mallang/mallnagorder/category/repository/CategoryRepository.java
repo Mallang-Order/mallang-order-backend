@@ -16,4 +16,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     Optional<Category> findByCategoryNameAndAdminId(String categoryName, Long adminId);
 
+    Optional<Category> findByIdAndAdminId(Long categoryId, Long adminId);
+
+
 }

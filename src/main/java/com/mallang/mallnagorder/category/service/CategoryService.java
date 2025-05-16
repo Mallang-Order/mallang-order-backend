@@ -50,8 +50,8 @@ public class CategoryService {
 
     // 카테고리 이름 수정
     @Transactional
-    public CategoryResponse updateCategory(Long categoryId, String newName) {
-        Category category = categoryRepository.findById(categoryId)
+    public CategoryResponse updateCategory(Long adminId, Long categoryId, String newName) {
+        Category category = categoryRepository.findByIdAndAdminId(categoryId, adminId)
                 .orElseThrow(() -> new CategoryException(CategoryExceptionType.CATEGORY_NOT_FOUND));
 
         // 이름 중복 검사
@@ -65,29 +65,10 @@ public class CategoryService {
         return toResponse(category);
     }
 
-    // 카테고리 조회(카테고리 아이디)
-    @Transactional(readOnly = true)
-    public CategoryResponse getCategoryById(Long categoryId) {
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new CategoryException(CategoryExceptionType.CATEGORY_NOT_FOUND));
-        return toResponse(category);
-    }
-
-    // 카테고리 조회(관리자 아이디)
-    @Transactional(readOnly = true)
-    public List<CategoryResponse> getCategoriesByAdminId(Long adminId) {
-        Admin admin = adminRepository.findById(adminId)
-                .orElseThrow(() -> new AdminException(AdminExceptionType.ADMIN_NOT_EXIST));
-
-        return categoryRepository.findAllByAdmin(admin).stream()
-                .map(this::toResponse)
-                .toList();
-    }
-
     // 카테고리 삭제
     @Transactional
-    public void deleteCategory(Long categoryId) {
-        Category category = categoryRepository.findById(categoryId)
+    public void deleteCategory(Long adminId, Long categoryId) {
+        Category category = categoryRepository.findByIdAndAdminId(categoryId, adminId)
                 .orElseThrow(() -> new CategoryException(CategoryExceptionType.CATEGORY_NOT_FOUND));
 
         // 기본 카테고리(전체 메뉴 리스트를 포함)는 삭제 불가능

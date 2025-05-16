@@ -30,9 +30,11 @@ public class OrderService {
     private final KioskRepository kioskRepository;
     private final MenuRepository menuRepository;
 
+    // 주문 생성
     @Transactional
-    public void placeOrder(OrderRequestDTO dto, Admin admin) {
-        Kiosk kiosk = kioskRepository.findById(dto.getKioskId())
+    public void placeOrder(Admin admin, OrderRequestDTO dto) {
+
+        Kiosk kiosk = kioskRepository.findByIdAndAdminId(dto.getKioskId(), admin.getId())
                 .orElseThrow(() -> new KioskException(KIOSK_NOT_FOUND));
 
         Order order = Order.builder()
@@ -58,5 +60,16 @@ public class OrderService {
 
             orderItemRepository.save(orderItem);
         }
+    }
+
+    // 주문 삭제
+    @Transactional
+    public void deleteOrdersByKiosk(Long adminId, Long kioskId) {
+        // 관리자 본인의 키오스크인지 확인
+        Kiosk kiosk = kioskRepository.findByIdAndAdminId(kioskId, adminId)
+                .orElseThrow(() -> new KioskException(KIOSK_NOT_FOUND));
+
+        // 해당 키오스크에 연관된 주문을 모두 삭제
+        orderRepository.deleteByKiosk(kiosk);
     }
 }

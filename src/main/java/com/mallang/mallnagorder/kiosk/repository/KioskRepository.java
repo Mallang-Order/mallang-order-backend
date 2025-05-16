@@ -11,5 +11,7 @@ public interface KioskRepository extends JpaRepository<Kiosk, Long> {
 
     List<Kiosk> findByAdmin(Admin admin);
 
+    Optional<Kiosk> findByIdAndAdminId(Long kioskId, Long adminId);
+
     Optional<Kiosk> findByAdminIdAndKioskNumber(Long adminId, int kioskNumber);
 }

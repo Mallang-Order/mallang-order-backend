@@ -29,8 +29,8 @@ public class MenuService {
 
     // 메뉴 생성
     @Transactional
-    public MenuResponse createMenu(MenuRequest request) {
-        Admin admin = adminRepository.findById(request.getAdminId())
+    public MenuResponse createMenu(Long adminId, MenuRequest request) {
+        Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new AdminException(AdminExceptionType.ADMIN_NOT_EXIST));
 
         // 'Default' 카테고리 검색 또는 생성
@@ -68,35 +68,17 @@ public class MenuService {
 
     // 메뉴 삭제
     @Transactional
-    public void deleteMenu(Long menuId){
-        Menu menu = menuRepository.findById(menuId)
+    public void deleteMenu(Long adminId, Long menuId){
+        Menu menu = menuRepository.findByIdAndAdminId(menuId, adminId)
                 .orElseThrow(() -> new MenuException(MenuExceptionType.MENU_NOT_FOUND));
 
         menuRepository.delete(menu);
-
-    }
-
-    // 카테고리 아이디로 메뉴 리스트 조회
-    @Transactional(readOnly = true)
-    public List<MenuResponse> getMenusByCategoryId(Long categoryId) {
-        List<Menu> menus = menuRepository.findByCategories_Id(categoryId);
-        return menus.stream()
-                .map(this::toResponse)
-                .toList();
-    }
-
-    // 메뉴 아이디로 메뉴 조회
-    @Transactional(readOnly = true)
-    public MenuResponse getMenuById(Long menuId) {
-        Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(() -> new MenuException(MenuExceptionType.MENU_NOT_FOUND));
-        return toResponse(menu);
     }
 
     // 메뉴 수정
     @Transactional
-    public MenuResponse updateMenu(Long menuId, MenuRequest request) {
-        Menu menu = menuRepository.findById(menuId)
+    public MenuResponse updateMenu(Long adminId, Long menuId, MenuRequest request) {
+        Menu menu = menuRepository.findByIdAndAdminId(menuId, adminId)
                 .orElseThrow(() -> new MenuException(MenuExceptionType.MENU_NOT_FOUND));
 
         // 필드 업데이트
