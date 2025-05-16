@@ -1,5 +1,6 @@
 package com.mallang.mallnagorder.admin.domain;
 
+import com.mallang.mallnagorder.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,11 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Admin {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long adminId;
+public class Admin extends BaseEntity {
 
     @Column(nullable = false, unique = true, length = 255)
     private String email;

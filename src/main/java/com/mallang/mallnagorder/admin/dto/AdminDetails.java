@@ -2,12 +2,14 @@ package com.mallang.mallnagorder.admin.dto;
 
 
 import com.mallang.mallnagorder.admin.domain.Admin;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
+@Getter
 public class AdminDetails implements UserDetails {
 
     private final Admin admin ;

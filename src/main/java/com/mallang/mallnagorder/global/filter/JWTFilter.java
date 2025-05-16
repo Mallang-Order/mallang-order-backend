@@ -1,5 +1,8 @@
 package com.mallang.mallnagorder.global.filter;
 
+import com.mallang.mallnagorder.admin.exception.AdminException;
+import com.mallang.mallnagorder.admin.exception.AdminExceptionType;
+import com.mallang.mallnagorder.admin.repository.AdminRepository;
 import com.mallang.mallnagorder.global.util.JWTUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import com.mallang.mallnagorder.admin.domain.Admin;
@@ -14,56 +17,52 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
+    private final AdminRepository adminRepository;
 
-    public JWTFilter(JWTUtil jwtUtil) {this.jwtUtil = jwtUtil;}
+    public JWTFilter(JWTUtil jwtUtil, AdminRepository adminRepository) {
+        this.jwtUtil = jwtUtil;
+        this.adminRepository = adminRepository;
+    }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
 
-        // 헤더에서 access키에 담긴 토큰을 꺼냄
         String accessToken = request.getHeader("access");
 
-        // 토큰이 없다면 다음 필터로 넘김
         if (accessToken == null) {
-
             filterChain.doFilter(request, response);
-
             return;
         }
 
-        // 토큰 만료 여부 확인, 만료시 다음 필터로 넘기지 않음
         try {
             jwtUtil.isExpired(accessToken);
         } catch (ExpiredJwtException e) {
-
-            //response body
-            PrintWriter writer = response.getWriter();
-            writer.print("access token expired");
-
-            //response status code
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().print("access token expired");
             return;
         }
 
+        // JWT에서 이메일 추출
+        String email = jwtUtil.getEmail(accessToken);
 
-        // adminName, role 값을 획득
-        String adminName = jwtUtil.getUsername(accessToken);
+        // DB에서 Admin 조회
+        Admin admin = adminRepository.findByEmail(email)
+                .orElseThrow(() -> new AdminException(AdminExceptionType.ADMIN_NOT_EXIST));
 
-        Admin admin = new Admin();
-        admin.setAdminName(adminName);
+        // ✅ AdminDetails 생성
         AdminDetails adminDetails = new AdminDetails(admin);
 
-        // 스프링 시큐리티 인증 토큰 생성
-        Authentication authToken = new UsernamePasswordAuthenticationToken(adminDetails, null, adminDetails.getAuthorities());
-        //세션에 사용자 등록
+        Authentication authToken = new UsernamePasswordAuthenticationToken(
+                adminDetails, null, adminDetails.getAuthorities()
+        );
+
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         filterChain.doFilter(request, response);
     }
-
 }

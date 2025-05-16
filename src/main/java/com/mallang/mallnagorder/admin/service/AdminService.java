@@ -11,39 +11,39 @@ import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+//import static javax.swing.text.html.parser.DTDConstants.ID;
+
 @Service
 public class AdminService {
 
     private final AdminRepository adminRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public AdminService(AdminRepository adminRepository,
-                        BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public AdminService(AdminRepository adminRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.adminRepository = adminRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    // 이메일 중복 및 형식 체크
+    //이메일 체크
     public void emailValidate(EmailCheckRequest emailCheckRequest) throws AdminException {
         String email = emailCheckRequest.getEmail();
+        // 이메일 중복 체크
         isExistEmail(email);
+        // 이메일 형식 체크
         checkEmailValid(email);
     }
 
-    // 회원 가입
     public Long join(JoinRequest joinRequest) {
         String email = joinRequest.getEmail();
         String password = joinRequest.getPassword();
         String adminName = joinRequest.getAdminName();
         String storeName = joinRequest.getStoreName();
 
-
         // 비밀번호 형식 체크
         checkPasswordValid(password);
 
         // 상점 이름 중복 체크
         isExistName(storeName);
-
 
         Admin admin = new Admin();
         admin.setEmail(email);
@@ -58,9 +58,9 @@ public class AdminService {
         Admin savedAdmin = adminRepository.save(admin);
 
         // 디버깅 로그 추가
-        System.out.println("Saved Admin ID: " + savedAdmin.getAdminId());
+        System.out.println("Saved Admin ID: " + savedAdmin.getId());
 
-        return savedAdmin.getAdminId();
+        return savedAdmin.getId();
     }
 
 
@@ -68,10 +68,9 @@ public class AdminService {
     public CheckResponse changeName(String email, String newName) throws AdminException {
 
         //이메일로 회원 찾기
-         Admin admin = adminRepository.findByEmail(email);
-        if (admin == null) {
-            throw new AdminException(AdminExceptionType.ADMIN_NOT_EXIST);
-        }
+         Admin admin = adminRepository.findByEmail(email)
+                 .orElseThrow(()-> new AdminException(AdminExceptionType.ADMIN_NOT_EXIST));
+
 
         //상점 이름 중복 확인
         isExistName(newName);
@@ -87,10 +86,9 @@ public class AdminService {
     public CheckResponse changePassword(String email, String oldPassword, String newPassword) throws AdminException {
 
         //이메일로 회원 찾기
-        Admin admin = adminRepository.findByEmail(email);
-        if (admin == null) {
-            throw new AdminException(AdminExceptionType.ADMIN_NOT_EXIST);
-        }
+        Admin admin = adminRepository.findByEmail(email)
+                .orElseThrow(()-> new AdminException(AdminExceptionType.ADMIN_NOT_EXIST));
+
 
         // 기존 비밀번호 확인
         if (!bCryptPasswordEncoder.matches(oldPassword, admin.getPassword())) {
@@ -116,10 +114,9 @@ public class AdminService {
     public CheckResponse deleteAdmin(String email, String password) throws AdminException {
 
         // 이메일로 회원 찾기
-        Admin admin = adminRepository.findByEmail(email);
-        if (admin == null) {
-            throw new AdminException(AdminExceptionType.ADMIN_NOT_EXIST); // 관리자가 존재하지 않으면 예외
-        }
+        Admin admin = adminRepository.findByEmail(email)
+                .orElseThrow(()-> new AdminException(AdminExceptionType.ADMIN_NOT_EXIST));
+
 
         // 비밀번호 확인
         if (!bCryptPasswordEncoder.matches(password, admin.getPassword())) {
@@ -163,6 +160,5 @@ public class AdminService {
             throw new AdminException(AdminExceptionType.ALREADY_EXIST_NAME);
         }
     }
-
 
 }

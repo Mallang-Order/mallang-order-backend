@@ -2,6 +2,7 @@ package com.mallang.mallnagorder.auth.config;
 
 
 
+import com.mallang.mallnagorder.admin.repository.AdminRepository;
 import com.mallang.mallnagorder.admin.repository.RefreshRepository;
 import com.mallang.mallnagorder.global.filter.JWTFilter;
 import com.mallang.mallnagorder.global.filter.LoginFilter;
@@ -32,12 +33,19 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
+    private final AdminRepository adminRepository; // ✅ 추가
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, RefreshRepository refreshRepository) {
+    // ✅ 생성자에서 주입
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration,
+                          JWTUtil jwtUtil,
+                          RefreshRepository refreshRepository,
+                          AdminRepository adminRepository) {
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil = jwtUtil;
         this.refreshRepository = refreshRepository;
+        this.adminRepository = adminRepository;
     }
+
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -100,7 +108,7 @@ public class SecurityConfig {
         // 필터 추가 및 순서 설정
         http
                 .addFilterBefore(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository), UsernamePasswordAuthenticationFilter.class)  // 로그인 필터
-                .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class)  // JWT 필터
+                .addFilterBefore(new JWTFilter(jwtUtil, adminRepository), LoginFilter.class)  // JWT 필터
                 .addFilterAfter(new LogoutFilter(jwtUtil, refreshRepository), JWTFilter.class);  // 로그아웃 필터 위치 (JWT 필터 뒤에)
 
         // 세션 설정 (Stateless)
