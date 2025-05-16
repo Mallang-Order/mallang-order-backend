@@ -68,10 +68,9 @@ public class AdminService {
     public CheckResponse changeName(String email, String newName) throws AdminException {
 
         //이메일로 회원 찾기
-         Admin admin = adminRepository.findByEmail(email);
-        if (admin == null) {
-            throw new AdminException(AdminExceptionType.ADMIN_NOT_EXIST);
-        }
+         Admin admin = adminRepository.findByEmail(email)
+                 .orElseThrow(()-> new AdminException(AdminExceptionType.ADMIN_NOT_EXIST));
+
 
         //상점 이름 중복 확인
         isExistName(newName);
@@ -87,10 +86,9 @@ public class AdminService {
     public CheckResponse changePassword(String email, String oldPassword, String newPassword) throws AdminException {
 
         //이메일로 회원 찾기
-        Admin admin = adminRepository.findByEmail(email);
-        if (admin == null) {
-            throw new AdminException(AdminExceptionType.ADMIN_NOT_EXIST);
-        }
+        Admin admin = adminRepository.findByEmail(email)
+                .orElseThrow(()-> new AdminException(AdminExceptionType.ADMIN_NOT_EXIST));
+
 
         // 기존 비밀번호 확인
         if (!bCryptPasswordEncoder.matches(oldPassword, admin.getPassword())) {
@@ -116,10 +114,9 @@ public class AdminService {
     public CheckResponse deleteAdmin(String email, String password) throws AdminException {
 
         // 이메일로 회원 찾기
-        Admin admin = adminRepository.findByEmail(email);
-        if (admin == null) {
-            throw new AdminException(AdminExceptionType.ADMIN_NOT_EXIST); // 관리자가 존재하지 않으면 예외
-        }
+        Admin admin = adminRepository.findByEmail(email)
+                .orElseThrow(()-> new AdminException(AdminExceptionType.ADMIN_NOT_EXIST));
+
 
         // 비밀번호 확인
         if (!bCryptPasswordEncoder.matches(password, admin.getPassword())) {

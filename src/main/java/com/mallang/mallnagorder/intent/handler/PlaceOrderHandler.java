@@ -2,14 +2,10 @@ package com.mallang.mallnagorder.intent.handler;
 
 import com.mallang.mallnagorder.admin.domain.Admin;
 import com.mallang.mallnagorder.intent.dto.payload.PlaceOrderPayload;
-import com.mallang.mallnagorder.order.dto.OrderItemDTO;
 import com.mallang.mallnagorder.order.dto.OrderRequestDTO;
 import com.mallang.mallnagorder.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 // 주문 처리 intent 핸들러
 @Component

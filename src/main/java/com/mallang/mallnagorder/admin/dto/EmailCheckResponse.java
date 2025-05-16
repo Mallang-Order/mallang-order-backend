@@ -1,7 +1,6 @@
 package com.mallang.mallnagorder.admin.dto;
 
 
-
 public class EmailCheckResponse {
 
     private boolean success;
