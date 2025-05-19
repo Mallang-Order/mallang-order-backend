@@ -87,7 +87,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         }
 
         // 토큰 생성
-        String access = jwtUtil.createJwt("access", username, role, 600000L); // 생명주기 10분
+        String access = jwtUtil.createJwt("access", username, role, 86400000L); // 생명주기 10분(600000L)
         String refresh = jwtUtil.createJwt("refresh", username, role, 86400000L); // 생명주기 24시간
 
         // Refresh 토큰 저장 - DB에 refresh 토큰이 쌓이는 문제 발생, 주기적으로 스케줄링 필요

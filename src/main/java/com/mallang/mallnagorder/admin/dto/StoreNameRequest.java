@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChangeNameRequest {
-    String newName;
-    String newNameEn;
+public class StoreNameRequest {
+    String storeName;
+    String storeNameEn;
 }

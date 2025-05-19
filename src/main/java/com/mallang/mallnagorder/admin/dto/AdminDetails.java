@@ -1,6 +1,5 @@
 package com.mallang.mallnagorder.admin.dto;
 
-
 import com.mallang.mallnagorder.admin.domain.Admin;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

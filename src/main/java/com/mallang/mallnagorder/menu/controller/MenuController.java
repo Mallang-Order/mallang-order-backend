@@ -17,28 +17,28 @@ public class MenuController {
 
     private final MenuService menuService;
 
-    // 메뉴 생성
-    @PostMapping
+    // 메뉴 생성 - 테스트 완료
+    @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<MenuResponse> createMenu(
             @AuthenticationPrincipal AdminDetails adminDetails,
-            @RequestBody MenuRequest request
+            @ModelAttribute MenuRequest request
     ) {
         MenuResponse response = menuService.createMenu(adminDetails.getAdmin().getId(), request);
-        return ResponseEntity.status(201).body(response); // 201 Created
+        return ResponseEntity.status(201).body(response);
     }
 
-    // 메뉴 수정
-    @PutMapping("/{menuId}")
+    // 메뉴 수정 - 테스트 완료
+    @PutMapping(value = "/{menuId}", consumes = "multipart/form-data")
     public ResponseEntity<MenuResponse> updateMenu(
             @AuthenticationPrincipal AdminDetails adminDetails,
             @PathVariable Long menuId,
-            @RequestBody MenuRequest request
+            @ModelAttribute MenuRequest request
     ) {
         MenuResponse response = menuService.updateMenu(adminDetails.getAdmin().getId(), menuId, request);
         return ResponseEntity.ok(response);
     }
 
-    // 메뉴 삭제
+    // 메뉴 삭제 - 테스트 완료
     @DeleteMapping("/{menuId}")
     public ResponseEntity<Void> deleteMenu(@AuthenticationPrincipal AdminDetails adminDetails,
                                            @PathVariable Long menuId) {

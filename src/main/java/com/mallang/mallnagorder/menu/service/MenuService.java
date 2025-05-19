@@ -6,6 +6,7 @@ import com.mallang.mallnagorder.admin.exception.AdminExceptionType;
 import com.mallang.mallnagorder.admin.repository.AdminRepository;
 import com.mallang.mallnagorder.category.domain.Category;
 import com.mallang.mallnagorder.category.repository.CategoryRepository;
+import com.mallang.mallnagorder.global.util.S3Uploader;
 import com.mallang.mallnagorder.menu.domain.Menu;
 import com.mallang.mallnagorder.menu.dto.MenuRequest;
 import com.mallang.mallnagorder.menu.dto.MenuResponse;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,44 +28,90 @@ public class MenuService {
     private final CategoryRepository categoryRepository;
     private final AdminRepository adminRepository;
     private final MenuRepository menuRepository;
+    private final S3Uploader s3Uploader;
 
-    // 메뉴 생성
     @Transactional
     public MenuResponse createMenu(Long adminId, MenuRequest request) {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new AdminException(AdminExceptionType.ADMIN_NOT_EXIST));
 
-        // 'Default' 카테고리 검색 또는 생성
-        Category defaultCategory = categoryRepository.findByCategoryNameAndAdminId("Default", admin.getId())
+        // Default 카테고리 확보
+        Category defaultCategory = categoryRepository.findByCategoryNameAndAdminId("전체", admin.getId())
                 .orElseGet(() -> {
                     Category newDefault = Category.builder()
-                            .categoryName("Default")
+                            .categoryName("전체")
+                            .categoryNameEn("All")
                             .admin(admin)
+                            .menus(new ArrayList<>())
                             .build();
                     return categoryRepository.save(newDefault);
                 });
 
-        // 요청에 따라 선택된 카테고리 추가 (선택적으로 추가)
         List<Category> categories = new ArrayList<>();
-        categories.add(defaultCategory); // 항상 전체 포함
-
+        categories.add(defaultCategory);
         if (request.getCategoryIds() != null) {
-            List<Category> extraCategories = categoryRepository.findAllById(request.getCategoryIds());
-            categories.addAll(extraCategories);
+            categories.addAll(categoryRepository.findAllById(request.getCategoryIds()));
         }
 
-        // 메뉴 생성
+        String imageUrl;
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
+            try {
+                imageUrl = s3Uploader.upload(request.getImage(), "menu");
+            } catch (IOException e) {
+                throw new RuntimeException("이미지 업로드 실패", e);
+            }
+        } else {
+            imageUrl = "https://mallangkiosk-menu-images.s3.ap-northeast-2.amazonaws.com/%E1%84%86%E1%85%A1%E1%86%AF%E1%84%85%E1%85%A1%E1%86%BC%E1%84%8B%E1%85%B5.png"; // 기본 이미지 URL
+        }
+
         Menu menu = Menu.builder()
                 .menuName(request.getMenuName())
+                .menuNameEn(request.getMenuNameEn())
                 .menuPrice(request.getMenuPrice())
-                .imageUrl(request.getImageUrl())
+                .imageUrl(imageUrl)
                 .admin(admin)
                 .categories(categories)
                 .build();
 
-        Menu saved = menuRepository.save(menu);
-        return toResponse(saved);
+        return toResponse(menuRepository.save(menu));
+    }
 
+    @Transactional
+    public MenuResponse updateMenu(Long adminId, Long menuId, MenuRequest request) {
+        Menu menu = menuRepository.findByIdAndAdminId(menuId, adminId)
+                .orElseThrow(() -> new MenuException(MenuExceptionType.MENU_NOT_FOUND));
+
+        menu.setMenuName(request.getMenuName());
+        menu.setMenuNameEn(request.getMenuNameEn());
+        menu.setMenuPrice(request.getMenuPrice());
+
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
+            try {
+                String imageUrl = s3Uploader.upload(request.getImage(), "menu");
+                menu.setImageUrl(imageUrl);
+            } catch (IOException e) {
+                throw new RuntimeException("이미지 업로드 실패", e);
+            }
+        }
+
+        // 카테고리 처리 동일
+        List<Category> categories = new ArrayList<>();
+        Category defaultCategory = categoryRepository.findByCategoryNameAndAdminId("전체", menu.getAdmin().getId())
+                .orElseGet(() -> {
+                    Category newDefault = Category.builder()
+                            .categoryName("전체")
+                            .categoryNameEn("All")
+                            .admin(menu.getAdmin())
+                            .build();
+                    return categoryRepository.save(newDefault);
+                });
+        categories.add(defaultCategory);
+        if (request.getCategoryIds() != null) {
+            categories.addAll(categoryRepository.findAllById(request.getCategoryIds()));
+        }
+        menu.setCategories(categories);
+
+        return toResponse(menu);
     }
 
     // 메뉴 삭제
@@ -75,48 +123,11 @@ public class MenuService {
         menuRepository.delete(menu);
     }
 
-    // 메뉴 수정
-    @Transactional
-    public MenuResponse updateMenu(Long adminId, Long menuId, MenuRequest request) {
-        Menu menu = menuRepository.findByIdAndAdminId(menuId, adminId)
-                .orElseThrow(() -> new MenuException(MenuExceptionType.MENU_NOT_FOUND));
-
-        // 필드 업데이트
-        menu.setMenuName(request.getMenuName());
-        menu.setMenuPrice(request.getMenuPrice());
-        menu.setImageUrl(request.getImageUrl());
-
-        // 카테고리 업데이트
-        List<Category> categories = new ArrayList<>();
-
-        // Default 카테고리 유지
-        Category defaultCategory = categoryRepository.findByCategoryNameAndAdminId("Default", menu.getAdmin().getId())
-                .orElseGet(() -> {
-                    Category newDefault = Category.builder()
-                            .categoryName("Default")
-                            .admin(menu.getAdmin())
-                            .build();
-                    return categoryRepository.save(newDefault);
-                });
-        categories.add(defaultCategory);
-
-        // 추가 카테고리 있으면 더함
-        if (request.getCategoryIds() != null) {
-            List<Category> extraCategories = categoryRepository.findAllById(request.getCategoryIds());
-            categories.addAll(extraCategories);
-        }
-
-        menu.setCategories(categories);
-
-        return toResponse(menu);
-    }
-
-
-
     public MenuResponse toResponse(Menu menu) {
         return MenuResponse.builder()
                 .menuId(menu.getId()) // 주의: getId(), getMenuId() 등 실제 필드명 확인 필요
                 .menuName(menu.getMenuName())
+                .menuNamEn(menu.getMenuNameEn())
                 .menuPrice(menu.getMenuPrice())
                 .imageUrl(menu.getImageUrl())
                 .adminId(menu.getAdmin().getId())
@@ -124,6 +135,7 @@ public class MenuService {
                         .map(category -> MenuResponse.CategoryInfo.builder()
                                 .categoryId(category.getId())
                                 .categoryName(category.getCategoryName())
+                                .categoryNameEn(category.getCategoryNameEn())
                                 .build())
                         .toList())
                 .build();

@@ -20,6 +20,9 @@ public class Menu extends BaseEntity {
     @Column(nullable = false, length = 100)
     private String menuName;
 
+    @Column(nullable = false, length = 100)
+    private String menuNameEn;
+
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal menuPrice;
 
@@ -38,4 +41,9 @@ public class Menu extends BaseEntity {
     )
     private List<Category> categories;
 
+    private boolean visible;
+
+    public boolean isVisible() {
+        return this.visible;
+    }
 }

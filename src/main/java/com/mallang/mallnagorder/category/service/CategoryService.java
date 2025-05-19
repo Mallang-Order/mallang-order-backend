@@ -11,7 +11,7 @@ import com.mallang.mallnagorder.category.exception.CategoryException;
 import com.mallang.mallnagorder.category.repository.CategoryRepository;
 import com.mallang.mallnagorder.menu.domain.Menu;
 import com.mallang.mallnagorder.menu.repository.MenuRepository;
-import org.springframework.transaction.annotation.Transactional; // ✅ 올바른 import
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,13 +28,16 @@ public class CategoryService {
 
     // 카테고리 생성
     @Transactional
-    public CategoryResponse createCategory(String categoryName, Long adminId) {
+    public CategoryResponse createCategory(String categoryName, String categoryNameEn, Long adminId) {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new AdminException(AdminExceptionType.ADMIN_NOT_EXIST));
 
         // 카테고리 이름 중복 검사
         if (categoryRepository.existsByCategoryNameAndAdminId(categoryName, adminId)) {
                 throw new CategoryException(CategoryExceptionType.ALREADY_EXIST_NAME);
+        }
+        if (categoryRepository.existsByCategoryNameEnAndAdminId(categoryNameEn, adminId)) {
+            throw new CategoryException(CategoryExceptionType.ALREADY_EXIST_NAME_EN);
         }
 
         Category category = Category.builder()
@@ -50,17 +53,20 @@ public class CategoryService {
 
     // 카테고리 이름 수정
     @Transactional
-    public CategoryResponse updateCategory(Long adminId, Long categoryId, String newName) {
-        Category category = categoryRepository.findByIdAndAdminId(categoryId, adminId)
+    public CategoryResponse updateCategory(Long adminId, Long categoryId, String newName, String newNameEn) {
+        Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryException(CategoryExceptionType.CATEGORY_NOT_FOUND));
 
-        // 이름 중복 검사
-        if (!category.getCategoryName().equals(newName)) {
-            if (categoryRepository.existsByCategoryNameAndAdminId(newName, category.getAdmin().getId())) {
-                throw new CategoryException(CategoryExceptionType.ALREADY_EXIST_NAME);
-            }
-            category.setCategoryName(newName);
+        // 카테고리 이름 중복 검사
+        if (categoryRepository.existsByCategoryNameAndAdminId(newName, adminId)) {
+            throw new CategoryException(CategoryExceptionType.ALREADY_EXIST_NAME);
         }
+        if (categoryRepository.existsByCategoryNameEnAndAdminId(newNameEn, adminId)) {
+            throw new CategoryException(CategoryExceptionType.ALREADY_EXIST_NAME_EN);
+        }
+
+        category.setCategoryName(newName);
+        category.setCategoryNameEn(newNameEn);
 
         return toResponse(category);
     }
@@ -72,7 +78,7 @@ public class CategoryService {
                 .orElseThrow(() -> new CategoryException(CategoryExceptionType.CATEGORY_NOT_FOUND));
 
         // 기본 카테고리(전체 메뉴 리스트를 포함)는 삭제 불가능
-        if (category.getCategoryName().equals("Default")) {
+        if (category.getCategoryName().equals("전체")) {
             throw new CategoryException(CategoryExceptionType.CANNOT_DELETE_DEFAULT_CATEGORY);
         }
 
@@ -90,8 +96,9 @@ public class CategoryService {
 
     private CategoryResponse toResponse(Category category) {
         return CategoryResponse.builder()
-                .id(category.getId())
-                .name(category.getCategoryName())
+                .categoryId(category.getId())
+                .categoryName(category.getCategoryName())
+                .categoryNameEn(category.getCategoryNameEn())
                 .adminId(category.getAdmin().getId())
                 .build();
     }

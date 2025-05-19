@@ -19,11 +19,13 @@ public class Category extends BaseEntity {
     @Column(nullable = false, length = 100)
     private String categoryName;
 
+    @Column(nullable = false, length = 100)
+    private String categoryNameEn;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_id", nullable = false)
     private Admin admin;
 
     @ManyToMany(mappedBy = "categories")
     private List<Menu> menus;
-
 }

@@ -1,5 +1,6 @@
 package com.mallang.mallnagorder.global.exception;
 
+import com.mallang.mallnagorder.admin.exception.AdminException;
 import com.mallang.mallnagorder.category.exception.CategoryException;
 import com.mallang.mallnagorder.kiosk.exception.KioskException;
 import com.mallang.mallnagorder.menu.exception.MenuException;
@@ -40,6 +41,14 @@ public class ExceptionControllerAdvice {
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);  // 500 Internal Server Error
     }
 
+    // AdminException
+    @ExceptionHandler(AdminException.class)
+    public ResponseEntity<ExceptionResponse> handleCategoryException(AdminException ex) {
+        log.error("AdminException 발생: {}", ex.getMessage(), ex);
+        ExceptionResponse response = ExceptionResponse.from(ex.getExceptionType());
+        return new ResponseEntity<>(response, ex.getExceptionType().getHttpStatus());
+    }
+
     // CategoryException
     @ExceptionHandler(CategoryException.class)
     public ResponseEntity<ExceptionResponse> handleCategoryException(CategoryException ex) {
@@ -59,7 +68,7 @@ public class ExceptionControllerAdvice {
     // KioskException
     @ExceptionHandler(KioskException.class)
     public ResponseEntity<ExceptionResponse> handleKioskException(KioskException ex) {
-        log.error("MenuException 발생: {}", ex.getMessage(), ex);
+        log.error("KioskException 발생: {}", ex.getMessage(), ex);
         ExceptionResponse response = ExceptionResponse.from(ex.getExceptionType());
         return new ResponseEntity<>(response, ex.getExceptionType().getHttpStatus());
     }

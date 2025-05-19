@@ -10,9 +10,9 @@ import java.util.Optional;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
-    List<Category> findAllByAdmin(Admin admin);
 
     boolean existsByCategoryNameAndAdminId(String categoryName, Long adminId);
+    boolean existsByCategoryNameEnAndAdminId(String categoryName, Long adminId);
 
     Optional<Category> findByCategoryNameAndAdminId(String categoryName, Long adminId);
 

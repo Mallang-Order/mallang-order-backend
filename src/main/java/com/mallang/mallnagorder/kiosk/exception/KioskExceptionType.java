@@ -5,8 +5,10 @@ import org.springframework.http.HttpStatus;
 
 public enum KioskExceptionType implements BaseExceptionType{
 
-    KIOSK_NOT_FOUND(HttpStatus.BAD_REQUEST, "KIOSK_001", "해당 키오스크를 찾을 수 없습니다."),
-    ACTIVE_KIOSK_EXISTS(HttpStatus.BAD_REQUEST, "KIOSK_002", "활성화된 키오스크가 있어 테이블 수를 변경할 수 없습니다.");
+    KIOSK_NOT_FOUND(HttpStatus.BAD_REQUEST, "KIOSK_001", "해당 테이블을 찾을 수 없습니다."),
+    ACTIVE_KIOSK_EXISTS(HttpStatus.BAD_REQUEST, "KIOSK_002", "사용 중인 테이블이 존재해 테이블 수를 변경할 수 없습니다."),
+    ALEADY_ACTIVE_KIOSK(HttpStatus.CONFLICT, "KIOSK_003", "이미 사용 중인 테이블 번호 입니다."),
+    ORDER_NOT_FOUND(HttpStatus.CONFLICT, "KIOSK_004", "아직 테이블 주문 내역이 없습니다.");
 
     private HttpStatus httpStatus;
     private String errorCode;

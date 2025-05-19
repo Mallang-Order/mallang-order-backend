@@ -1,16 +1,14 @@
 package com.mallang.mallnagorder.admin.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @Getter
-@Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class JoinRequest {
-
+public class StoreInfoResponse {
     private String email;
-    private String password;
     private String adminName;
     private String storeName;
     private String storeNameEn;
+    private int kioskCount;
 }

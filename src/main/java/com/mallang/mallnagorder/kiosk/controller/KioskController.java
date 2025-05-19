@@ -1,6 +1,10 @@
 package com.mallang.mallnagorder.kiosk.controller;
 
 import com.mallang.mallnagorder.admin.dto.AdminDetails;
+import com.mallang.mallnagorder.kiosk.dto.ActivateKioskRequest;
+import com.mallang.mallnagorder.kiosk.dto.ActivateKioskResponse;
+import com.mallang.mallnagorder.kiosk.dto.DeactiveKioskRequest;
+import com.mallang.mallnagorder.kiosk.dto.KioskCountRequest;
 import com.mallang.mallnagorder.kiosk.service.KioskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,21 +18,29 @@ public class KioskController {
 
     private final KioskService kioskService;
 
+    // 키오스크 세팅
     @PostMapping("/set")
-    public ResponseEntity<String> setKiosks(@AuthenticationPrincipal AdminDetails adminDetails,
-                                            @RequestParam int count) {
+    public ResponseEntity<String> setKiosks(
+            @AuthenticationPrincipal AdminDetails adminDetails,
+            @RequestBody KioskCountRequest request) {
 
-        kioskService.setKiosks(adminDetails.getAdmin(), count);
+        kioskService.setKiosks(adminDetails.getAdmin(), request.getCount());
         return ResponseEntity.ok("테이블 정보가 성공적으로 설정되었습니다.");
     }
 
+    // 키오스크 활성화
     @PostMapping("/activate")
-    public ResponseEntity<String> activateKiosk(
-            @AuthenticationPrincipal AdminDetails adminDetails,
-            @RequestParam int kioskNumber) {
-
-        kioskService.activateKioskByNumber(adminDetails.getAdmin().getId(), kioskNumber);
-        return ResponseEntity.ok(kioskNumber + "번 테이블이 성공적으로 활성화되었습니다.");
+    public ResponseEntity<ActivateKioskResponse> activateKiosk(
+            @RequestBody ActivateKioskRequest request) {
+        ActivateKioskResponse response = kioskService.activateKioskByStoreNameAndNumber(
+                request.getStoreName(), request.getKioskNumber());
+        return ResponseEntity.ok(response);
     }
 
+    // 키오스크 비활성화
+    @PostMapping("/deactivate")
+    public ResponseEntity<String> deactivateKiosk(@RequestBody DeactiveKioskRequest request) {
+        int kioskNumber = kioskService.deactivateKioskByNumber(request.getKioskId());
+        return ResponseEntity.ok(kioskNumber + "번 테이블이 비활성화 처리되었습니다.");
+    }
 }
