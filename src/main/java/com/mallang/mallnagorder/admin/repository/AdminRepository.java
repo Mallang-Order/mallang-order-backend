@@ -19,4 +19,8 @@ public interface AdminRepository extends JpaRepository<Admin, Long> {
     boolean existsByStoreNameEn(String storeNameEn);
 
     Optional<Admin> findByStoreName(String storeName);
+
+    boolean existsByStoreNameAndIdNot(String storeName, Long id);
+
+    boolean existsByStoreNameEnAndIdNot(String storeNameEn, Long id);
 }

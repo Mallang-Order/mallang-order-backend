@@ -8,5 +8,4 @@ import lombok.*;
 public class ActivateKioskResponse {
     private Long adminId;
     private Long kioskId;
-
 }

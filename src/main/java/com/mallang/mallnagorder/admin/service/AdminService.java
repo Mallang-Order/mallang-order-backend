@@ -126,10 +126,10 @@ public class AdminService {
                 .orElseThrow(()-> new AdminException(AdminExceptionType.ADMIN_NOT_EXIST));
 
         // 상점 이름 중복 확인 한글, 영문
-        if (adminRepository.existsByStoreName(newName)){
+        if (adminRepository.existsByStoreNameAndIdNot(newName, admin.getId())) {
             throw new AdminException(AdminExceptionType.ALREADY_EXIST_STORENAME);
         }
-        if (adminRepository.existsByStoreNameEn(newNameEn)){
+        if (adminRepository.existsByStoreNameEnAndIdNot(newNameEn, admin.getId())) {
             throw new AdminException(AdminExceptionType.ALREADY_EXIST_STORENAME_EN);
         }
 

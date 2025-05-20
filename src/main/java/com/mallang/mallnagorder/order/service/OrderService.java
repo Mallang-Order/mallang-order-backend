@@ -2,9 +2,11 @@ package com.mallang.mallnagorder.order.service;
 
 import com.mallang.mallnagorder.kiosk.domain.Kiosk;
 import com.mallang.mallnagorder.kiosk.exception.KioskException;
+import com.mallang.mallnagorder.kiosk.exception.KioskExceptionType;
 import com.mallang.mallnagorder.kiosk.repository.KioskRepository;
 import com.mallang.mallnagorder.menu.domain.Menu;
 import com.mallang.mallnagorder.menu.exception.MenuException;
+import com.mallang.mallnagorder.menu.exception.MenuExceptionType;
 import com.mallang.mallnagorder.menu.repository.MenuRepository;
 import com.mallang.mallnagorder.order.domain.Order;
 import com.mallang.mallnagorder.order.domain.OrderItem;
@@ -19,9 +21,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mallang.mallnagorder.kiosk.exception.KioskExceptionType.KIOSK_NOT_FOUND;
-import static com.mallang.mallnagorder.menu.exception.MenuExceptionType.MENU_NOT_FOUND;
-
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -34,7 +33,7 @@ public class OrderService {
     public void createOrder(OrderRequest request) {
         // 1. 키오스크 조회
         Kiosk kiosk = kioskRepository.findById(request.getKioskId())
-                .orElseThrow(() -> new KioskException(KIOSK_NOT_FOUND));
+                .orElseThrow(() -> new KioskException(KioskExceptionType.KIOSK_NOT_FOUND));
 
         // 2. 주문 아이템 처리 및 총합 계산
         BigDecimal totalPrice = BigDecimal.ZERO;
@@ -42,7 +41,7 @@ public class OrderService {
 
         for (OrderItemRequest itemRequest : request.getItems()) {
             Menu menu = menuRepository.findById(itemRequest.getMenuId())
-                    .orElseThrow(() -> new MenuException(MENU_NOT_FOUND));
+                    .orElseThrow(() -> new MenuException(MenuExceptionType.MENU_NOT_FOUND));
 
             OrderItem orderItem = OrderItem.builder()
                     .menu(menu)
@@ -76,7 +75,7 @@ public class OrderService {
     public void deleteOrdersByKiosk(Long adminId, int kioskNumber) {
         // 관리자 본인의 키오스크인지 확인
         Kiosk kiosk = kioskRepository.findByAdminIdAndKioskNumber(adminId, kioskNumber)
-                .orElseThrow(() -> new KioskException(KIOSK_NOT_FOUND));
+                .orElseThrow(() -> new KioskException(KioskExceptionType.KIOSK_NOT_FOUND));
 
         // 해당 키오스크에 연관된 주문을 모두 삭제
         orderRepository.deleteByKiosk(kiosk);

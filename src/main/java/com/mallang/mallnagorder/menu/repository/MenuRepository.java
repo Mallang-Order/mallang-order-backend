@@ -13,4 +13,10 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
 
     Optional<Menu> findByIdAndAdminId(Long menuId, Long adminId);
 
+    boolean existsByMenuNameAndAdminId(String menuName, Long adminId);
+    boolean existsByMenuNameEnAndAdminId(String cmenuNameEn, Long adminId);
+
+    boolean existsByMenuNameAndAdminIdAndIdNot(String name, Long adminId, Long id);
+    boolean existsByMenuNameEnAndAdminIdAndIdNot(String nameEn, Long adminId, Long id);
+
 }

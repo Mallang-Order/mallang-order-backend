@@ -13,14 +13,14 @@ import java.util.stream.Collectors;
 @Getter
 @Builder
 @AllArgsConstructor
-public class CategoryViewResponse {
+public class CategoryWithMenuResponse {
     private Long categoryId;
     private String categoryName;
     private String categoryNameEn;
     private List<MenuView> menus;
 
-    public static CategoryViewResponse from(Category category) {
-        return CategoryViewResponse.builder()
+    public static CategoryWithMenuResponse from(Category category) {
+        return CategoryWithMenuResponse.builder()
                 .categoryId(category.getId())
                 .categoryName(category.getCategoryName())
                 .categoryNameEn(category.getCategoryNameEn())

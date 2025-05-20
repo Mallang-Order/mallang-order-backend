@@ -1,6 +1,5 @@
 package com.mallang.mallnagorder.menu.dto;
 
-import com.mallang.mallnagorder.category.domain.Category;
 import com.mallang.mallnagorder.menu.domain.Menu;
 import lombok.*;
 
@@ -16,7 +15,7 @@ import java.util.stream.Collectors;
 public class MenuResponse {
     private Long menuId;
     private String menuName;
-    private String menuNamEn;
+    private String menuNameEn;
     private BigDecimal menuPrice;
     private String imageUrl;
     private Long adminId;
@@ -26,13 +25,13 @@ public class MenuResponse {
         return MenuResponse.builder()
                 .menuId(menu.getId())
                 .menuName(menu.getMenuName())
-                .menuNamEn(menu.getMenuNameEn())
+                .menuNameEn(menu.getMenuNameEn())
                 .menuPrice(menu.getMenuPrice())
                 .imageUrl(menu.getImageUrl())
                 .adminId(menu.getAdmin().getId())
                 .categories(
                         menu.getCategories().stream()
-                                .map(category -> new CategoryInfo(category.getId(), category.getCategoryName(),category.getCategoryName()))
+                                .map(category -> new CategoryInfo(category.getId(), category.getCategoryName(),category.getCategoryNameEn()))
                                 .collect(Collectors.toList())
                 )
                 .build();

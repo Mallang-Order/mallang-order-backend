@@ -16,7 +16,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -34,16 +36,20 @@ public class CategoryService {
 
         // 카테고리 이름 중복 검사
         if (categoryRepository.existsByCategoryNameAndAdminId(categoryName, adminId)) {
-                throw new CategoryException(CategoryExceptionType.ALREADY_EXIST_NAME);
+            throw new CategoryException(CategoryExceptionType.ALREADY_EXIST_NAME);
         }
         if (categoryRepository.existsByCategoryNameEnAndAdminId(categoryNameEn, adminId)) {
             throw new CategoryException(CategoryExceptionType.ALREADY_EXIST_NAME_EN);
         }
 
+        // 중복 없는 메뉴 리스트 생성
+        Set<Menu> menuSet = new LinkedHashSet<>();
+
         Category category = Category.builder()
                 .categoryName(categoryName)
+                .categoryNameEn(categoryNameEn)
                 .admin(admin)
-                .menus(new ArrayList<>())  // 메뉴 리스트는 비어 있어도 OK
+                .menus(new ArrayList<>(menuSet)) // 초기엔 빈 Set -> List
                 .build();
 
         Category saved = categoryRepository.save(category);
@@ -51,25 +57,30 @@ public class CategoryService {
         return toResponse(saved);
     }
 
-    // 카테고리 이름 수정
+
     @Transactional
     public CategoryResponse updateCategory(Long adminId, Long categoryId, String newName, String newNameEn) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryException(CategoryExceptionType.CATEGORY_NOT_FOUND));
 
-        // 카테고리 이름 중복 검사
-        if (categoryRepository.existsByCategoryNameAndAdminId(newName, adminId)) {
+        // 본인을 제외한 중복 여부 검사
+        if (categoryRepository.existsByCategoryNameAndAdminIdAndIdNot(newName, adminId, categoryId)) {
             throw new CategoryException(CategoryExceptionType.ALREADY_EXIST_NAME);
         }
-        if (categoryRepository.existsByCategoryNameEnAndAdminId(newNameEn, adminId)) {
+        if (categoryRepository.existsByCategoryNameEnAndAdminIdAndIdNot(newNameEn, adminId, categoryId)) {
             throw new CategoryException(CategoryExceptionType.ALREADY_EXIST_NAME_EN);
         }
 
         category.setCategoryName(newName);
         category.setCategoryNameEn(newNameEn);
 
+        // 중복 제거 후 메뉴 세팅 (기존 메뉴 유지)
+        Set<Menu> distinctMenus = new LinkedHashSet<>(category.getMenus());
+        category.setMenus(new ArrayList<>(distinctMenus));
+
         return toResponse(category);
     }
+
 
     // 카테고리 삭제
     @Transactional

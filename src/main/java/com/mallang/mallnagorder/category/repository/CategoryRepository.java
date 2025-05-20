@@ -12,11 +12,13 @@ import java.util.Optional;
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     boolean existsByCategoryNameAndAdminId(String categoryName, Long adminId);
-    boolean existsByCategoryNameEnAndAdminId(String categoryName, Long adminId);
+    boolean existsByCategoryNameEnAndAdminId(String categoryNameEn, Long adminId);
 
     Optional<Category> findByCategoryNameAndAdminId(String categoryName, Long adminId);
 
     Optional<Category> findByIdAndAdminId(Long categoryId, Long adminId);
 
+    boolean existsByCategoryNameAndAdminIdAndIdNot(String name, Long adminId, Long id);
+    boolean existsByCategoryNameEnAndAdminIdAndIdNot(String nameEn, Long adminId, Long id);
 
 }

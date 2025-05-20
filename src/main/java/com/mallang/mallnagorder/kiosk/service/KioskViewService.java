@@ -1,15 +1,12 @@
 package com.mallang.mallnagorder.kiosk.service;
 
-import com.mallang.mallnagorder.category.dto.CategoryViewResponse;
+import com.mallang.mallnagorder.category.dto.CategoryWithMenuResponse;
 import com.mallang.mallnagorder.kiosk.domain.Kiosk;
 import com.mallang.mallnagorder.kiosk.exception.KioskException;
 import com.mallang.mallnagorder.kiosk.exception.KioskExceptionType;
 import com.mallang.mallnagorder.kiosk.repository.KioskRepository;
-import com.mallang.mallnagorder.menu.domain.Menu;
-import com.mallang.mallnagorder.menu.dto.MenuViewResponse;
 import com.mallang.mallnagorder.order.domain.Order;
 import com.mallang.mallnagorder.order.dto.response.OrderResponse;
-import com.mallang.mallnagorder.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,24 +18,13 @@ import java.util.List;
 public class KioskViewService {
 
     private final KioskRepository kioskRepository;
-    private final OrderRepository orderRepository;
 
-    public List<CategoryViewResponse> getCategoriesByKiosk(Long kioskId) {
+    public List<CategoryWithMenuResponse> getCategoriesByKiosk(Long kioskId) {
         Kiosk kiosk = kioskRepository.findById(kioskId)
                 .orElseThrow(() -> new KioskException(KioskExceptionType.KIOSK_NOT_FOUND));
 
         return kiosk.getAdmin().getCategories().stream()
-                .map(CategoryViewResponse::from)
-                .toList();
-    }
-
-    public List<MenuViewResponse> getMenusByKiosk(Long kioskId) {
-        Kiosk kiosk = kioskRepository.findById(kioskId)
-                .orElseThrow(() -> new KioskException(KioskExceptionType.KIOSK_NOT_FOUND));
-
-        return kiosk.getAdmin().getMenus().stream()
-                .filter(Menu::isVisible)
-                .map(MenuViewResponse::from)
+                .map(CategoryWithMenuResponse::from)
                 .toList();
     }
 

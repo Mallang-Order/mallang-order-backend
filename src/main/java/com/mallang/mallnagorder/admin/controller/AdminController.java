@@ -32,12 +32,14 @@ public class AdminController {
 
     // 테스트 완료
     @PostMapping("/emailSend")
-    public ResponseEntity<String> emailSend(@RequestBody EmailCheckRequest request) throws MessagingException, UnsupportedEncodingException {
+    public ResponseEntity<CheckResponse> emailSend(@RequestBody EmailCheckRequest request) throws MessagingException, UnsupportedEncodingException {
         adminService.emailValidate(request);
         String authNum = emailAuthService.sendAuthNumber(request.getEmail());
         log.info("이메일 인증번호 발송: {}", authNum);
-        return new ResponseEntity<>("이메일 인증번호가 발송되었습니다. 인증을 진행해주세요.", HttpStatus.OK);
+
+        return ResponseEntity.ok(new CheckResponse(true, "이메일 인증번호가 발송되었습니다. 인증을 진행해주세요."));
     }
+
 
     // 테스트 완료
     @PostMapping("/emailCheck")
