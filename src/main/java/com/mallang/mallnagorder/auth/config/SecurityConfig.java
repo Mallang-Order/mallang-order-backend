@@ -72,13 +72,15 @@ public class SecurityConfig {
                     @Override
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                         CorsConfiguration configuration = new CorsConfiguration();
-                        configuration.setAllowedOrigins(List.of(
-                                "http://localhost:3000",
-                                "https://localhost:3000",
-                                "http://localhost:5173",
-                                "https://localhost:5173",
-                                "https://mallang-order-admin.vercel.app" // 실제 배포된 프론트 주소
-                        ));
+//                        configuration.setAllowedOrigins(List.of(
+//                                "http://localhost:3000",
+//                                "https://localhost:3000",
+//                                "http://localhost:5173",
+//                                "https://localhost:5173",
+//                                "https://mallang-order-admin.vercel.app", // 실제 배포된 프론트 주소
+//                                "https://mallang-test.vercel.app"
+//                        ));
+                        configuration.setAllowedOriginPatterns(List.of("*"));
                         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
                         configuration.setAllowedHeaders(List.of("*"));
                         configuration.setAllowCredentials(true);

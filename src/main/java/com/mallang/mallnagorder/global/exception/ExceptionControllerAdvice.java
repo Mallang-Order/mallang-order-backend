@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.io.UnsupportedEncodingException;
 
@@ -31,6 +32,14 @@ public class ExceptionControllerAdvice {
         log.error("UnsupportedEncodingException 발생: {}", ex.getMessage(), ex);
         ExceptionResponse response = ExceptionResponse.from("이메일 인증 발송에 실패했습니다. 다시 시도해주세요.");
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);  // 500 Internal Server Error
+    }
+
+    // 이미지 크기 예외 처리
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ExceptionResponse> handleMaxSizeException(MaxUploadSizeExceededException ex) {
+        log.error("MaxUploadSizeExceededException 발생: {}", ex.getMessage(), ex);
+        ExceptionResponse response = ExceptionResponse.from("파일 크기가 너무 큽니다. 최대 5MB까지 업로드할 수 있습니다.");
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     // 모든 예외 처리 (Generic)
@@ -72,6 +81,4 @@ public class ExceptionControllerAdvice {
         ExceptionResponse response = ExceptionResponse.from(ex.getExceptionType());
         return new ResponseEntity<>(response, ex.getExceptionType().getHttpStatus());
     }
-
-
 }

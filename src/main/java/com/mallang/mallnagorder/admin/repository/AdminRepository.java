@@ -2,8 +2,10 @@ package com.mallang.mallnagorder.admin.repository;
 
 import com.mallang.mallnagorder.admin.domain.Admin;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -23,4 +25,8 @@ public interface AdminRepository extends JpaRepository<Admin, Long> {
     boolean existsByStoreNameAndIdNot(String storeName, Long id);
 
     boolean existsByStoreNameEnAndIdNot(String storeNameEn, Long id);
+
+    @Query("SELECT a.id FROM Admin a")
+    List<Long> findAllAdminIds();
+
 }

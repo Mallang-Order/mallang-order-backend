@@ -1,0 +1,9 @@
+{
+  "admin_id" : 8,
+  "categories" : [ {
+    "categoryId" : 28,
+    "categoryName" : "전체",
+    "categoryNameEn" : "All",
+    "menus" : [ ]
+  } ]
+}

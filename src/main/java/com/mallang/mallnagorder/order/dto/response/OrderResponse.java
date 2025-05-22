@@ -8,16 +8,13 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class OrderResponse {
+    private Long kioskId;
     private int kioskNumber;
+    private boolean kioskIsActive;
     private List<OrderSummary> orders;
-
-    @Builder
-    public OrderResponse(int kioskNumber, List<OrderSummary> orders) {
-        this.kioskNumber = kioskNumber;
-        this.orders = orders;
-    }
 
     @Getter
     @Builder

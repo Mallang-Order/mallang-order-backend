@@ -31,17 +31,10 @@ public class KioskViewService {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public OrderResponse getOrdersByKiosk(Long kioskId) {
-
         Kiosk kiosk = kioskRepository.findById(kioskId)
                 .orElseThrow(() -> new KioskException(KioskExceptionType.KIOSK_NOT_FOUND));
 
         List<Order> orders = kiosk.getOrders();
-
-        if (orders.isEmpty()) {
-            throw new KioskException(KioskExceptionType.ORDER_NOT_FOUND);
-        }
-
-        int kioskNumber = orders.get(0).getKiosk().getKioskNumber(); // 같은 키오스크의 주문이므로 하나만 참조
 
         List<OrderResponse.OrderSummary> orderSummaries = orders.stream()
                 .map(order -> OrderResponse.OrderSummary.builder()
@@ -50,6 +43,7 @@ public class KioskViewService {
                         .items(order.getOrderItems().stream()
                                 .map(item -> OrderResponse.OrderItemSummary.builder()
                                         .menuName(item.getMenu().getMenuName())
+                                        .menuNameEn(item.getMenu().getMenuNameEn())
                                         .menuPrice(item.getMenu().getMenuPrice())
                                         .quantity(item.getQuantity())
                                         .build())
@@ -58,9 +52,12 @@ public class KioskViewService {
                 .toList();
 
         return OrderResponse.builder()
-                .kioskNumber(kioskNumber)
-                .orders(orderSummaries)
+                .kioskId(kioskId)
+                .kioskNumber(kiosk.getKioskNumber()) // ← 여기서 바로 가져옴
+                .kioskIsActive(kiosk.getIsActive())
+                .orders(orderSummaries) // 주문 없으면 빈 배열
                 .build();
     }
+
 
 }

@@ -277,6 +277,7 @@ public class AdminService {
                                     .items(order.getOrderItems().stream()
                                             .map(item -> OrderResponse.OrderItemSummary.builder()
                                                     .menuName(item.getMenu().getMenuName())
+                                                    .menuNameEn(item.getMenu().getMenuNameEn())
                                                     .menuPrice(item.getMenu().getMenuPrice())
                                                     .quantity(item.getQuantity())
                                                     .build())
@@ -285,7 +286,9 @@ public class AdminService {
                             .collect(Collectors.toList());
 
                     return OrderResponse.builder()
+                            .kioskId(kiosk.getId())
                             .kioskNumber(kiosk.getKioskNumber())
+                            .kioskIsActive(kiosk.getIsActive())
                             .orders(orderSummaries)
                             .build();
                 })

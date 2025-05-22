@@ -41,4 +41,9 @@ public class Menu extends BaseEntity {
     )
     private List<Category> categories;
 
+    private boolean visible;
+
+    public boolean isVisible() {
+        return this.visible;
+    }
 }
