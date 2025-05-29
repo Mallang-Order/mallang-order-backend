@@ -1,12 +1,13 @@
 package com.mallang.mallnagorder.order.domain;
 
 import com.mallang.mallnagorder.admin.domain.Admin;
+import com.mallang.mallnagorder.global.entity.BaseEntity;
 import com.mallang.mallnagorder.kiosk.domain.Kiosk;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -15,17 +16,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Order {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long orderId;
+public class Order extends BaseEntity {
 
     @Column(precision = 10, scale = 2)
     private BigDecimal totalPrice;
 
     @Column(nullable = false)
-    private LocalDateTime orderTime;
+    private boolean isCompleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "kiosk_id")
@@ -35,4 +32,7 @@ public class Order {
     @JoinColumn(name = "admin_id", nullable = false)
     private Admin admin;
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<OrderItem> orderItems = new java.util.ArrayList<>();
 }
