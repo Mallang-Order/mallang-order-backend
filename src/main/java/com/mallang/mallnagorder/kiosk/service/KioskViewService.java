@@ -1,6 +1,7 @@
 package com.mallang.mallnagorder.kiosk.service;
 
 import com.mallang.mallnagorder.category.dto.CategoryWithMenuResponse;
+import com.mallang.mallnagorder.category.repository.CategoryRepository;
 import com.mallang.mallnagorder.kiosk.domain.Kiosk;
 import com.mallang.mallnagorder.kiosk.exception.KioskException;
 import com.mallang.mallnagorder.kiosk.exception.KioskExceptionType;
@@ -18,12 +19,15 @@ import java.util.List;
 public class KioskViewService {
 
     private final KioskRepository kioskRepository;
+    private final CategoryRepository categoryRepository;
 
     public List<CategoryWithMenuResponse> getCategoriesByKiosk(Long kioskId) {
         Kiosk kiosk = kioskRepository.findById(kioskId)
                 .orElseThrow(() -> new KioskException(KioskExceptionType.KIOSK_NOT_FOUND));
 
-        return kiosk.getAdmin().getCategories().stream()
+        Long adminId = kiosk.getAdmin().getId(); // admin 전체를 쓰지 않고 ID만 추출
+
+        return categoryRepository.findAllWithMenusByAdminId(adminId).stream()
                 .map(CategoryWithMenuResponse::from)
                 .toList();
     }

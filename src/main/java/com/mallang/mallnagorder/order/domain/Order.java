@@ -1,12 +1,12 @@
 package com.mallang.mallnagorder.order.domain;
 
-import com.mallang.mallnagorder.admin.domain.Admin;
 import com.mallang.mallnagorder.global.entity.BaseEntity;
 import com.mallang.mallnagorder.kiosk.domain.Kiosk;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -28,11 +28,7 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "kiosk_id")
     private Kiosk kiosk;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin_id", nullable = false)
-    private Admin admin;
-
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<OrderItem> orderItems = new java.util.ArrayList<>();
+    private List<OrderItem> orderItems = new ArrayList<>();
+
 }

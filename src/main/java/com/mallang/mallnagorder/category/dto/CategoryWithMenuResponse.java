@@ -2,12 +2,15 @@ package com.mallang.mallnagorder.category.dto;
 
 import com.mallang.mallnagorder.category.domain.Category;
 import com.mallang.mallnagorder.menu.domain.Menu;
+import com.mallang.mallnagorder.menu.domain.MenuCategory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Getter
@@ -20,17 +23,24 @@ public class CategoryWithMenuResponse {
     private List<MenuView> menus;
 
     public static CategoryWithMenuResponse from(Category category) {
+        List<MenuView> menus = Collections.emptyList();
+        if (category.getMenuCategories() != null) {
+            menus = category.getMenuCategories().stream()
+                    .map(MenuCategory::getMenu)
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .map(MenuView::from)
+                    .collect(Collectors.toList());
+        }
+
         return CategoryWithMenuResponse.builder()
                 .categoryId(category.getId())
                 .categoryName(category.getCategoryName())
                 .categoryNameEn(category.getCategoryNameEn())
-                .menus(
-                        category.getMenus().stream()
-                                .map(MenuView::from)
-                                .collect(Collectors.toList())
-                )
+                .menus(menus)
                 .build();
     }
+
 
     @Getter
     @Builder

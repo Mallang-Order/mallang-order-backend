@@ -2,6 +2,7 @@ package com.mallang.mallnagorder.category.dto;
 
 import com.mallang.mallnagorder.category.domain.Category;
 import com.mallang.mallnagorder.menu.domain.Menu;
+import com.mallang.mallnagorder.menu.domain.MenuCategory;
 import lombok.*;
 
 import java.util.List;
@@ -24,14 +25,16 @@ public class CategoryResponse {
                 .categoryId(category.getId())
                 .categoryName(category.getCategoryName())
                 .categoryNameEn(category.getCategoryNameEn())
-                .adminId(category.getAdmin().getId())
+                .adminId(category.getAdminId())
                 .menus(
-                        category.getMenus().stream()
+                        category.getMenuCategories().stream()
+                                .map(MenuCategory::getMenu)
                                 .map(menu -> new MenuInfo(menu.getId(), menu.getMenuName(), menu.getMenuNameEn()))
                                 .collect(Collectors.toList())
                 )
                 .build();
     }
+
 
     @Getter
     @Setter

@@ -1,6 +1,7 @@
 package com.mallang.mallnagorder.menu.dto;
 
 import com.mallang.mallnagorder.menu.domain.Menu;
+import com.mallang.mallnagorder.menu.domain.MenuCategory;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -28,14 +29,20 @@ public class MenuResponse {
                 .menuNameEn(menu.getMenuNameEn())
                 .menuPrice(menu.getMenuPrice())
                 .imageUrl(menu.getImageUrl())
-                .adminId(menu.getAdmin().getId())
+                .adminId(menu.getAdminId())
                 .categories(
-                        menu.getCategories().stream()
-                                .map(category -> new CategoryInfo(category.getId(), category.getCategoryName(),category.getCategoryNameEn()))
+                        menu.getMenuCategories().stream()
+                                .map(MenuCategory::getCategory)
+                                .map(category -> new CategoryInfo(
+                                        category.getId(),
+                                        category.getCategoryName(),
+                                        category.getCategoryNameEn()
+                                ))
                                 .collect(Collectors.toList())
                 )
                 .build();
     }
+
 
     @Getter
     @Setter
