@@ -5,8 +5,6 @@ import com.mallang.mallnagorder.menu.domain.Menu;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
-
 @Entity
 @Getter
 @Setter

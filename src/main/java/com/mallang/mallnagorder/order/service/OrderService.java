@@ -55,7 +55,6 @@ public class OrderService {
         // 3. Order 생성 및 연관 설정
         Order order = Order.builder()
                 .kiosk(kiosk)
-                .admin(kiosk.getAdmin())
                 .isCompleted(false)
                 .totalPrice(totalPrice)
                 .build();

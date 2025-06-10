@@ -13,7 +13,9 @@ import com.mallang.mallnagorder.category.dto.CategoryResponse;
 import com.mallang.mallnagorder.category.repository.CategoryRepository;
 import com.mallang.mallnagorder.kiosk.domain.Kiosk;
 import com.mallang.mallnagorder.kiosk.repository.KioskRepository;
+import com.mallang.mallnagorder.menu.domain.Menu;
 import com.mallang.mallnagorder.menu.dto.MenuResponse;
+import com.mallang.mallnagorder.menu.repository.MenuRepository;
 import com.mallang.mallnagorder.order.dto.response.OrderResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -31,13 +33,15 @@ public class AdminService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final CategoryRepository categoryRepository;
     private final KioskRepository kioskRepository;
+    private final MenuRepository menuRepository;
 
 
-    public AdminService(AdminRepository adminRepository, BCryptPasswordEncoder bCryptPasswordEncoder, CategoryRepository categoryRepository, KioskRepository kioskRepository) {
+    public AdminService(AdminRepository adminRepository, BCryptPasswordEncoder bCryptPasswordEncoder, CategoryRepository categoryRepository, KioskRepository kioskRepository, MenuRepository menuRepository) {
         this.adminRepository = adminRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.categoryRepository = categoryRepository;
         this.kioskRepository = kioskRepository;
+        this.menuRepository = menuRepository;
     }
 
     /*
@@ -92,8 +96,8 @@ public class AdminService {
             Category defaultCategory = Category.builder()
                     .categoryName("전체")
                     .categoryNameEn("All")
-                    .admin(admin)
-                    .menus(new ArrayList<>())
+                    .adminId(admin.getId())
+                    .menuCategories(new ArrayList<>())
                     .build();
             categoryRepository.save(defaultCategory);
         }
@@ -242,34 +246,29 @@ public class AdminService {
     }
 
     public List<CategoryResponse> getCategories(Long adminId) {
-        Admin admin = adminRepository.findById(adminId)
-                .orElseThrow(()-> new AdminException(AdminExceptionType.ADMIN_NOT_EXIST));
-        return admin.getCategories().stream()
+        List<Category> categories = categoryRepository.findByAdminId(adminId);
+        return categories.stream()
                 .map(CategoryResponse::from)
                 .toList();
     }
 
+
     public List<MenuResponse> getMenus(Long adminId) {
-        Admin admin = adminRepository.findById(adminId)
-                .orElseThrow(()-> new AdminException(AdminExceptionType.ADMIN_NOT_EXIST));
-        return admin.getMenus().stream()
+        List<Menu> menus = menuRepository.findByAdminId(adminId);
+        return menus.stream()
                 .map(MenuResponse::from)
                 .toList();
     }
+
 
     // 관리자 주문 조회
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public List<OrderResponse> getOrders(Long adminId) {
-        Admin admin = adminRepository.findById(adminId)
-                .orElseThrow(() -> new AdminException(AdminExceptionType.ADMIN_NOT_EXIST));
-
-        // 관리자가 가진 모든 키오스크 조회
-        List<Kiosk> kiosks = kioskRepository.findAllByAdmin(admin);
+        List<Kiosk> kiosks = kioskRepository.findAllByAdminId(adminId);
 
         return kiosks.stream()
                 .map(kiosk -> {
-                    // 각 키오스크의 주문들 매핑
                     List<OrderResponse.OrderSummary> orderSummaries = kiosk.getOrders().stream()
                             .map(order -> OrderResponse.OrderSummary.builder()
                                     .orderId(order.getId())
@@ -294,5 +293,6 @@ public class AdminService {
                 })
                 .collect(Collectors.toList());
     }
+
 
 }

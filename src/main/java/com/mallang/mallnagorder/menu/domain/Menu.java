@@ -1,12 +1,11 @@
 package com.mallang.mallnagorder.menu.domain;
 
-import com.mallang.mallnagorder.admin.domain.Admin;
-import com.mallang.mallnagorder.category.domain.Category;
 import com.mallang.mallnagorder.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -29,21 +28,32 @@ public class Menu extends BaseEntity {
     @Column(nullable = false, length = 2083)
     private String imageUrl = "";
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin_id", nullable = false)
-    private Admin admin;
+    @Column(name = "admin_id", nullable = false)
+    private Long adminId;
 
-    @ManyToMany
-    @JoinTable(
-            name = "menu_category",
-            joinColumns = @JoinColumn(name = "menu_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
-    )
-    private List<Category> categories;
+    @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<MenuCategory> menuCategories = new ArrayList<>();
 
     private boolean visible;
 
     public boolean isVisible() {
         return this.visible;
     }
+
+    public void addMenuCategory(MenuCategory menuCategory) {
+        // 중복 체크
+        boolean exists = this.menuCategories.stream()
+                .anyMatch(mc -> mc.getId().equals(menuCategory.getId()));
+        if (!exists) {
+            this.menuCategories.add(menuCategory);
+            menuCategory.getCategory().getMenuCategories().add(menuCategory);
+        }
+    }
+
+    public void removeMenuCategory(MenuCategory menuCategory) {
+        this.menuCategories.remove(menuCategory);
+        menuCategory.getCategory().getMenuCategories().remove(menuCategory);
+    }
+
 }

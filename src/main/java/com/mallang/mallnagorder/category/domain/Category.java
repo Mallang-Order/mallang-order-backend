@@ -3,9 +3,11 @@ package com.mallang.mallnagorder.category.domain;
 import com.mallang.mallnagorder.admin.domain.Admin;
 import com.mallang.mallnagorder.global.entity.BaseEntity;
 import com.mallang.mallnagorder.menu.domain.Menu;
+import com.mallang.mallnagorder.menu.domain.MenuCategory;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -23,12 +25,12 @@ public class Category extends BaseEntity {
     @Column(nullable = false, length = 100)
     private String categoryNameEn;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin_id", nullable = false)
-    private Admin admin;
+    @Column(name = "admin_id", nullable = false)
+    private Long adminId;
 
-    @ManyToMany(mappedBy = "categories")
-    private List<Menu> menus;
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<MenuCategory> menuCategories = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {
@@ -42,6 +44,5 @@ public class Category extends BaseEntity {
     public int hashCode() {
         return Objects.hash(getId());
     }
-
 
 }

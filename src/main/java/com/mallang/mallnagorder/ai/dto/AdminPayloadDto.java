@@ -43,9 +43,13 @@ public class AdminPayloadDto {
                     .categoryId(category.getId())
                     .categoryName(category.getCategoryName())
                     .categoryNameEn(category.getCategoryNameEn())
-                    .menus(category.getMenus().stream()
-                            .map(MenuView::from)
-                            .collect(Collectors.toList()))
+                    .menus(
+                            java.util.Optional.ofNullable(category.getMenuCategories())
+                                    .orElse(List.of()) // 빈 리스트로 대체
+                                    .stream()
+                                    .map(menuCategory -> MenuView.from(menuCategory.getMenu()))
+                                    .collect(Collectors.toList())
+                    )
                     .build();
         }
     }

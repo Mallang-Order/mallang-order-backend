@@ -1,7 +1,6 @@
 package com.mallang.mallnagorder.ai.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mallang.mallnagorder.admin.repository.AdminRepository;
 import com.mallang.mallnagorder.ai.dto.AdminPayloadDto;
 import com.mallang.mallnagorder.category.repository.CategoryRepository;
 import com.mallang.mallnagorder.category.domain.Category;
